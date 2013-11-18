@@ -1,11 +1,9 @@
-# jipe
+![Stolen Logo](http://i.imgur.com/L6qW35a.png)
 
 jipe is a pipe to filter, extract from and pretty print a stream of JSON
 objects.
 
 [![build status](https://secure.travis-ci.org/dokipen/jipe.png)](http://travis-ci.org/dokipen/jipe)
-
-![Stolen Logo](http://i.imgur.com/L6qW35a.png)
 
 ## Using
 
