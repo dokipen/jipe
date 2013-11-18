@@ -5,6 +5,8 @@ objects.
 
 [![build status](https://secure.travis-ci.org/dokipen/jipe.png)](http://travis-ci.org/dokipen/jipe)
 
+![Stolen Logo](http://i.imgur.com/L6qW35a.png)
+
 ## Using
 
     $ npm install jipe
