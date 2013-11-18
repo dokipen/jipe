@@ -13,7 +13,7 @@ objects.
 
 ## Query Language
 
-Internally, jipe uses [Inquiry](http://bigeasy.github.io/inquiry/) to filter and extract from JSON objects. Please refer to [Inquiry]'s documentation to find out how to query your JSON.
+Internally, jipe uses [Inquiry](http://bigeasy.github.io/inquiry/) to filter and extract from JSON objects. Please refer to [Inquiry](http://bigeasy.github.io/inquiry/)'s documentation to find out how to query your JSON.
 
 ## FAQ
 
