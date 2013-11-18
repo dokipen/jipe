@@ -23,7 +23,7 @@ function JSONParseStream(options) {
 }
 
 JSONParseStream.prototype._transform = function(chunk, encoding, done) {
-  debug('entering transform [%s] %s', this._state, this._buffer)
+  debug('entering transform [%s] %s', this._state, this._buffer);
   var buffer = this._decoder.write(chunk);
 
   while (buffer.length > 0 || this._state == 'PARSING') {
@@ -34,20 +34,21 @@ JSONParseStream.prototype._transform = function(chunk, encoding, done) {
       // eat bullshit between objects (usually whitespace) until [ or {
       var s0 = buffer.indexOf('{');
       var s1 = buffer.indexOf('[');
+      var start = 0;
       if (s0 == -1 && s1 == -1) {
         // object doesn't start in this chunk, so just drop it
-        return done()
+        return done();
       } else if ([s0, s1].indexOf(-1) >= 0) {
         // only one start symbol was found
-        var start = Math.max(s0, s1);
+        start = Math.max(s0, s1);
       } else {
         // both were found, use the first one
-        var start = Math.min(s0, s1)
+        start = Math.min(s0, s1);
       }
       // get first char in so we know what to look for
-      this._buffer = buffer.substr(start, 1)
+      this._buffer = buffer.substr(start, 1);
       buffer = buffer.substr(start + 1);
-      this._state = 'COLLECTING'
+      this._state = 'COLLECTING';
     } else if (this._state == 'COLLECTING') {
       // collect until matching pair terminator
       var terminator = PAIRS[this._buffer[0]];
@@ -59,7 +60,7 @@ JSONParseStream.prototype._transform = function(chunk, encoding, done) {
         this._state = 'PARSING';
       } else {
         this._buffer += buffer;
-        buffer = ""
+        buffer = "";
       }
     } else if (this._state == 'PARSING') {
       try {
@@ -78,7 +79,7 @@ JSONParseStream.prototype._transform = function(chunk, encoding, done) {
 
     }
   }
-  debug('exiting transform [%s] %s', this._state, this._buffer)
+  debug('exiting transform [%s] %s', this._state, this._buffer);
   done();
 };
 

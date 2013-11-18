@@ -21,9 +21,12 @@ function InquiryStream(options) {
 
 InquiryStream.prototype._transform = function(input, _, done) {
   debug('input: %j', input);
-  var output = _u.first(this._query(input));
-  debug('output: %j', output);
-  if (output) {
+  var output = this._query(input);
+  if (output.length == 1) {
+    debug('output: %j', output[0]);
+    this.push(output[0]);
+  } else if (output.length > 1) {
+    debug('output: %j', output);
     this.push(output);
   }
   done();
