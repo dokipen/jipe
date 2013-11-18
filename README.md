@@ -19,3 +19,13 @@ Internally, jipe uses [Inquiry](http://bigeasy.github.io/inquiry/) to filter and
 
 Is it efficient? No. I have spent zero effort making the parsing algorithm
 efficient. I may or may not in the future.
+
+Is it safe? No. If you pass in invalid JSON, it will just keep buffering data
+and trying to parse it until it explodes. It cannot recover from bad JSON.
+
+What is valid JSON? Arrays and Objects. That's it. Valid JSON begins with
+{ or [ and ends with } or ]. Any non-[ or non-{ characters before the starting
+delimiter or after the ending delimeter are simply ignored.
+
+Does it care about newlines? No, you json can span multple lines, and doesn't
+need any newlines between objects.
