@@ -26,16 +26,17 @@ JSONParseStream.prototype._transform = function(chunk, encoding, done) {
   debug('**entering transform**');
   this._buffer += this._decoder.write(chunk);
 
-  debug('--entering eat bullshit loop--');
-  debug('first char: %s', this._buffer[0]);
-  debug('length: %s', this._buffer.length);
-  while (this._buffer[0] != '[' && this._buffer[0] != '{' && this._buffer.length > 0) {
-    debug('discarding: %s', this._buffer[0]);
-    this._buffer = this._buffer.substr(1);
-  }
 
   debug('--entering search loop--');
   while (this._buffer.length > 1 && this._lastIndex + 1 < this._buffer.length) {
+    debug('--entering eat bullshit loop--');
+    debug('first char: %s', this._buffer[0]);
+    debug('length: %s', this._buffer.length);
+    while (this._buffer[0] != '[' && this._buffer[0] != '{' && this._buffer.length > 0) {
+      debug('discarding: %s', this._buffer[0]);
+      this._buffer = this._buffer.substr(1);
+    }
+    debug('--done eat bullshit loop--');
     debug('buffer: %s', this._buffer);
     debug('lastIndex: %d', this._lastIndex);
     var delim = PAIRS[this._buffer[0]];
@@ -58,7 +59,8 @@ JSONParseStream.prototype._transform = function(chunk, encoding, done) {
           this._buffer = "";
         }
         this._lastIndex = 0;
-        if (this._buffer.length <= 0) {
+        debug('reset lastIndex to 0');
+        if (this._buffer.length == 0) {
           break;
         }
       } catch(e) {
