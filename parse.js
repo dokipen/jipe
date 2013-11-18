@@ -3,11 +3,11 @@ var StringDecoder = require('string_decoder').StringDecoder;
 var Transform = require('stream').Transform;
 util.inherits(JSONParseStream, Transform);
 
-var debug = require('debug')('jipe.parse'),
-    PAIRS = {
-      '[': ']',
-      '{': '}'
-    };
+var debug = require('debug')('jipe.parse');
+var PAIRS = {
+  '[': ']',
+  '{': '}'
+};
 
 function JSONParseStream(options) {
   if (!(this instanceof JSONParseStream)) {
@@ -18,60 +18,67 @@ function JSONParseStream(options) {
   this._writableState.objectMode = false;
   this._readableState.objectMode = true;
   this._buffer = '';
-  this._lastIndex = 0;
+  this._state = 'DONE'; // PARSING, COLLECTING
   this._decoder = new StringDecoder('utf8');
 }
 
 JSONParseStream.prototype._transform = function(chunk, encoding, done) {
-  debug('**entering transform**');
-  this._buffer += this._decoder.write(chunk);
+  debug('entering transform [%s] %s', this._state, this._buffer)
+  var buffer = this._decoder.write(chunk);
 
-
-  debug('--entering search loop--');
-  while (this._buffer.length > 1 && this._lastIndex + 1 < this._buffer.length) {
-    debug('--entering eat bullshit loop--');
-    debug('first char: %s', this._buffer[0]);
-    debug('length: %s', this._buffer.length);
-    while (this._buffer[0] != '[' && this._buffer[0] != '{' && this._buffer.length > 0) {
-      debug('discarding: %s', this._buffer[0]);
-      this._buffer = this._buffer.substr(1);
-    }
-    debug('--done eat bullshit loop--');
-    debug('buffer: %s', this._buffer);
-    debug('lastIndex: %d', this._lastIndex);
-    var delim = PAIRS[this._buffer[0]];
-    debug('finding %s', delim);
-    var index = this._buffer.indexOf(delim, this._lastIndex + 1);
-    debug('index: %d', index);
-    if (index > 0) {
-      var part = this._buffer.substr(0, index + 1);
+  while (buffer.length > 0 || this._state == 'PARSING') {
+    debug('state: %s', this._state);
+    debug('buffer: %s', buffer);
+    debug('parse buffer: %s', this._buffer);
+    if (this._state == 'DONE') {
+      // eat bullshit between objects (usually whitespace) until [ or {
+      var s0 = buffer.indexOf('{');
+      var s1 = buffer.indexOf('[');
+      if (s0 == -1 && s1 == -1) {
+        // object doesn't start in this chunk, so just drop it
+        return done()
+      } else if ([s0, s1].indexOf(-1) >= 0) {
+        // only one start symbol was found
+        var start = Math.max(s0, s1);
+      } else {
+        // both were found, use the first one
+        var start = Math.min(s0, s1)
+      }
+      // get first char in so we know what to look for
+      this._buffer = buffer.substr(start, 1)
+      buffer = buffer.substr(start + 1);
+      this._state = 'COLLECTING'
+    } else if (this._state == 'COLLECTING') {
+      // collect until matching pair terminator
+      var terminator = PAIRS[this._buffer[0]];
+      debug('searching for %s', terminator);
+      var index = buffer.indexOf(terminator);
+      if (index >= 0) {
+        this._buffer += buffer.substr(0, index + 1);
+        buffer = buffer.substr(index + 1);
+        this._state = 'PARSING';
+      } else {
+        this._buffer += buffer;
+        buffer = ""
+      }
+    } else if (this._state == 'PARSING') {
       try {
-        var obj = JSON.parse(part);
-        debug('parsed: %j', obj);
+        var obj = JSON.parse(this._buffer);
         try {
           this.push(obj);
         } catch(e) {
           debug('failed to push %j', obj);
         }
-        try {
-          this._buffer = this._buffer.substr(index + 1);
-        } catch(e) {
-          this._buffer = "";
-        }
-        this._lastIndex = 0;
-        debug('reset lastIndex to 0');
-        if (this._buffer.length == 0) {
-          break;
-        }
+        this._buffer = '';
+        this._state = 'DONE';
       } catch(e) {
-        debug('didn\'t parse: %s', part);
-        this._lastIndex = index;
+        debug('didn\'t parse: %s', this._buffer);
+        this._state = 'COLLECTING';
       }
-    } else {
-      this._lastIndex = this._buffer.length - 1;
+
     }
   }
-  debug('**exiting transform**');
+  debug('exiting transform [%s] %s', this._state, this._buffer)
   done();
 };
 
