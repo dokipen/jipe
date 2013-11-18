@@ -7,9 +7,9 @@ objects.
 
 ## Using
 
-  $ npm install jipe
-  $ jipe --help
-  $ jipe < abunchofjsonobjects.json
+    $ npm install jipe
+    $ jipe --help
+    $ jipe < abunchofjsonobjects.json
 
 ## Query Language
 
