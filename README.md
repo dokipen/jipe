@@ -27,5 +27,5 @@ What is valid JSON? Arrays and Objects. That's it. Valid JSON begins with
 { or [ and ends with } or ]. Any non-[ or non-{ characters before the starting
 delimiter or after the ending delimeter are simply ignored.
 
-Does it care about newlines? No, you json can span multple lines, and doesn't
+Does it care about newlines? No, your JSON can span multple lines, and doesn't
 need any newlines between objects.
