@@ -4,6 +4,7 @@ var Transform = require('stream').Transform;
 util.inherits(JSONParseStream, Transform);
 
 var debug = require('debug')('jipe.parse');
+var _ = require('underscore');
 var PAIRS = {
   '[': ']',
   '{': '}'
@@ -14,17 +15,27 @@ function JSONParseStream(options) {
     return new JSONParseStream(options);
   }
 
+  var conf = _.extend({
+    skip: 0
+  }, options);
+
   Transform.call(this, options);
   this._writableState.objectMode = false;
   this._readableState.objectMode = true;
   this._buffer = '';
   this._state = 'DONE'; // PARSING, COLLECTING
   this._decoder = new StringDecoder('utf8');
+  this._to_skip = conf.skip;
 }
 
 JSONParseStream.prototype._transform = function(chunk, encoding, done) {
   debug('entering transform [%s] %s', this._state, this._buffer);
   var buffer = this._decoder.write(chunk);
+
+  if (this._to_skip > 0) {
+    buffer = buffer.substr(this._to_skip);
+    this._to_skip = 0;
+  }
 
   while (buffer.length > 0 || this._state == 'PARSING') {
     debug('state: %s', this._state);

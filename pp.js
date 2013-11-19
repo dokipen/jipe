@@ -1,5 +1,4 @@
 var util = require('util');
-var StringDecoder = require('string_decoder').StringDecoder;
 var Transform = require('stream').Transform;
 util.inherits(JSONPrintStream, Transform);
 

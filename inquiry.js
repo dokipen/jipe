@@ -1,11 +1,9 @@
 var util = require('util');
-var StringDecoder = require('string_decoder').StringDecoder;
 var Transform = require('stream').Transform;
 util.inherits(InquiryStream, Transform);
 
 var $q = require('inquiry');
 var debug = require('debug')('jipe.inquiry');
-var _u = require('underscore');
 
 function InquiryStream(options) {
   if (!(this instanceof InquiryStream)) {

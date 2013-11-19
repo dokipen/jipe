@@ -33,7 +33,8 @@
     "debug": "~0.7.4",
     "optimist": "~0.6.0",
     "inquiry": "0.0.2",
-    "underscore": "~1.5.2"
+    "underscore": "~1.5.2",
+    "JSONPath": "~0.9.1"
   },
   "devDependencies": {
     "mocha": "~1.14.0",
